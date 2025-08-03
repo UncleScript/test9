@@ -1,4 +1,4 @@
--- SKIDDED BY SIGMA @rizzify101 | Accurate Dinosaur, Primal & Zen Egg Support
+-- SKIDDED BY SIGMA @UncleScript | Accurate Dinosaur, Primal & Zen Egg Support
 local Players = game:GetService("Players")
 local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
@@ -113,7 +113,7 @@ title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.TextColor3 = Color3.new(1,1,1)
-title.Text = "Pet Changer, SKIDDED BY Uncle Script"
+title.Text = "Pet Changer, SKIDDED BY SIGMA @Uncle Script"
 
 local button = Instance.new("TextButton", frame)
 button.Size = UDim2.new(0.9,0,0.4,0)
