@@ -1,99 +1,98 @@
--- SETUP
-local player = game.Players.LocalPlayer
+-- 🌱 Grow a Garden Hatch Visual with Egg Data
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "JadeHub"
+gui.Name = "HatchVisual"
+gui.ResetOnSpawn = false
 
--- FUNCTIONALITY TABLES
-local eggList = {"Cat", "Dog", "Dragon", "Phoenix", "Slime", "Unicorn"}
+-- 🐣 PET DATABASE BY EGG TYPE
+local eggPets = {
+    ["Common Egg"]     = {"Dog","Golden Lab","Bunny"},
+    ["Uncommon Egg"]   = {"Black Bunny","Cat","Chicken","Deer"},
+    ["Rare Egg"]       = {"Monkey","Orange Tabby","Pig","Rooster","Spotted Deer"},
+    ["Legendary Egg"]  = {"Cow","Silver Monkey","Sea Otter","Turtle","Polar Bear"},
+    ["Mythical Egg"]   = {"Grey Mouse","Brown Mouse","Squirrel","Red Giant Ant","Red Fox"},
+    ["Bug Egg"]        = {"Snail","Giant Ant","Caterpillar","Praying Mantis","Dragonfly"},
+    ["Bee Egg"]        = {"Bee","Honey Bee","Bear Bee","Petal Bee","Queen Bee"},
+    ["Paradise Egg"]   = {"Ostrich","Peacock","Capybara","Scarlet Macaw","Mimic Octopus"},
+    ["Oasis Egg"]      = {"Meerkat","Sand Snake","Axolotl","Hyacinth Macaw"},
+    ["Dinosaur Egg"]   = {"Pterodactyl","Raptor","Triceratops","Stegosaurus","Brontosaurus","T-Rex"},
+    ["Primal Egg"]     = {"Parasaurolophus","Iguanodon","Pachycephalosaurus","Dilophosaurus","Ankylosaurus","Spinosaurus"},
+    ["Zen Egg"]        = {"Shiba Inu","Nihonzaru","Tanuki","Tanchozuru","Kappa","Kitsune"},
+}
 
--- UTILITY FUNCTION TO FIND PLAYER
-local function getPlayerByName(name)
-	for _, p in ipairs(game.Players:GetPlayers()) do
-		if p.Name:lower():sub(1, #name) == name:lower() then
-			return p
-		end
-	end
-	return nil
-end
+-- 🧩 IMAGE PLACEHOLDER MAPPING (fill with real IDs later)
+local petImages = {
+    ["Dog"] = "rbxassetid://123456",
+    ["Golden Lab"] = "rbxassetid://123457",
+    ["Bunny"] = "rbxassetid://123458",
+    -- Add all pets here with actual image IDs
+}
 
--- TRADE FREEZE FUNCTION
-local function freezeTradeFor(targetName)
-	local victim = getPlayerByName(targetName)
-	if victim and victim:FindFirstChild("PlayerGui") then
-		local tradeGui = victim.PlayerGui:FindFirstChild("TradeGUI") -- Update this if your GUI is named differently
-		if tradeGui then
-			tradeGui.Enabled = false
-			warn("Trade GUI frozen for " .. victim.Name)
-		else
-			warn("Trade GUI not found for " .. victim.Name)
-		end
-	else
-		warn("Player not found: " .. targetName)
-	end
-end
-
--- EGG RANDOMIZER FUNCTION
-local function randomizeEgg()
-	local eggName = eggList[math.random(1, #eggList)]
-	print("Randomized Egg Hatch Result: " .. eggName)
-	-- Example: spawn pet logic here
-	-- fire event or bind to server script depending on your setup
-end
-
--- GUI ELEMENTS (simplified)
+-- GUI Elements
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 500, 0, 250)
-frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-frame.BackgroundColor3 = Color3.fromRGB(0, 85, 0)
+frame.Size = UDim2.new(0, 300, 0, 300)
+frame.Position = UDim2.new(0.5, -150, 0.5, -150)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.Visible = false
 
 local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 30)
-title.BackgroundColor3 = Color3.fromRGB(0, 128, 0)
-title.Text = "JADE HUB V3.1 - MADE BY Uncle Script."
-title.TextColor3 = Color3.new(1,1,1)
-title.TextSize = 22
-title.Font = Enum.Font.SourceSansBold
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Text = "🌱 Hatching..."
+title.Font = Enum.Font.GothamBold
+title.TextSize = 28
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1, 1, 1)
 
--- USERNAME INPUT
-local userBox = Instance.new("TextBox", frame)
-userBox.Position = UDim2.new(0, 260, 0, 40)
-userBox.Size = UDim2.new(0, 200, 0, 30)
-userBox.PlaceholderText = "Enter Victim Username"
-userBox.Font = Enum.Font.SourceSans
-userBox.TextColor3 = Color3.new(0,0,0)
-userBox.BackgroundColor3 = Color3.new(1,1,1)
+local image = Instance.new("ImageLabel", frame)
+image.Size = UDim2.new(0, 150, 0, 150)
+image.Position = UDim2.new(0.5, -75, 0.5, -75)
+image.BackgroundTransparency = 1
 
--- TRADE FREEZE BUTTON
-local freezeBtn = Instance.new("TextButton", frame)
-freezeBtn.Position = UDim2.new(0, 10, 0, 40)
-freezeBtn.Size = UDim2.new(0, 180, 0, 30)
-freezeBtn.Text = "TRADE FREEZE"
-freezeBtn.TextColor3 = Color3.new(1,1,1)
-freezeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-freezeBtn.MouseButton1Click:Connect(function()
-	local victim = userBox.Text
-	if victim ~= "" then
-		freezeTradeFor(victim)
-	else
-		warn("Enter a username first.")
-	end
-end)
+local nameLabel = Instance.new("TextLabel", frame)
+nameLabel.Position = UDim2.new(0, 0, 1, -60)
+nameLabel.Size = UDim2.new(1, 0, 0, 40)
+nameLabel.Font = Enum.Font.GothamBold
+nameLabel.TextSize = 24
+nameLabel.TextColor3 = Color3.new(1, 1, 1)
+nameLabel.BackgroundTransparency = 1
 
--- EGG RANDOMIZER BUTTON
-local eggBtn = Instance.new("TextButton", frame)
-eggBtn.Position = UDim2.new(0, 10, 0, 80)
-eggBtn.Size = UDim2.new(0, 180, 0, 30)
-eggBtn.Text = "EGG RANDOMIZER"
-eggBtn.TextColor3 = Color3.new(1,1,1)
-eggBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-eggBtn.MouseButton1Click:Connect(randomizeEgg)
+local mutationLabel = Instance.new("TextLabel", frame)
+mutationLabel.Position = UDim2.new(0, 0, 1, -30)
+mutationLabel.Size = UDim2.new(1, 0, 0, 30)
+mutationLabel.Font = Enum.Font.Gotham
+mutationLabel.TextSize = 18
+mutationLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+mutationLabel.BackgroundTransparency = 1
 
--- Discord footer
-local discord = Instance.new("TextLabel", frame)
-discord.Size = UDim2.new(1, 0, 0, 30)
-discord.Position = UDim2.new(0, 0, 1, -30)
-discord.Text = "DISCORD - discord.gg/4ZYnQD6KBT"
-discord.TextColor3 = Color3.fromRGB(180, 180, 255)
-discord.Font = Enum.Font.SourceSansItalic
-discord.TextSize = 16
-discord.BackgroundTransparency = 1
+-- 👁️ HATCH VISUAL FUNCTION
+local function showHatch(eggType, isMutated)
+    local petList = eggPets[eggType]
+    if not petList then warn("Unknown egg type:", eggType) return end
+
+    local petName = petList[math.random(1, #petList)]
+    local petImage = petImages[petName] or "rbxassetid://0"
+
+    image.Image = petImage
+    nameLabel.Text = petName
+    mutationLabel.Text = isMutated and "🔥 Mutated!" or ""
+
+    frame.Visible = true
+    image.Rotation = 0
+
+    local spin = TweenService:Create(image, TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {Rotation = 360})
+    spin:Play()
+
+    task.wait(2.5)
+    spin:Cancel()
+    task.wait(1)
+    frame.Visible = false
+end
+
+-- 🧪 Example hatch
+task.wait(1)
+showHatch("Bug Egg", math.random(1, 5) == 1)
