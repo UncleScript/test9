@@ -1,16 +1,51 @@
--- JADE HUB V3.1 GUI - Modified by Uncle Script
-
+-- SETUP
 local player = game.Players.LocalPlayer
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "JadeHub"
 
--- Create Main Frame
+-- FUNCTIONALITY TABLES
+local eggList = {"Cat", "Dog", "Dragon", "Phoenix", "Slime", "Unicorn"}
+
+-- UTILITY FUNCTION TO FIND PLAYER
+local function getPlayerByName(name)
+	for _, p in ipairs(game.Players:GetPlayers()) do
+		if p.Name:lower():sub(1, #name) == name:lower() then
+			return p
+		end
+	end
+	return nil
+end
+
+-- TRADE FREEZE FUNCTION
+local function freezeTradeFor(targetName)
+	local victim = getPlayerByName(targetName)
+	if victim and victim:FindFirstChild("PlayerGui") then
+		local tradeGui = victim.PlayerGui:FindFirstChild("TradeGUI") -- Update this if your GUI is named differently
+		if tradeGui then
+			tradeGui.Enabled = false
+			warn("Trade GUI frozen for " .. victim.Name)
+		else
+			warn("Trade GUI not found for " .. victim.Name)
+		end
+	else
+		warn("Player not found: " .. targetName)
+	end
+end
+
+-- EGG RANDOMIZER FUNCTION
+local function randomizeEgg()
+	local eggName = eggList[math.random(1, #eggList)]
+	print("Randomized Egg Hatch Result: " .. eggName)
+	-- Example: spawn pet logic here
+	-- fire event or bind to server script depending on your setup
+end
+
+-- GUI ELEMENTS (simplified)
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 500, 0, 250)
 frame.Position = UDim2.new(0.3, 0, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(0, 85, 0)
 
--- Title
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundColor3 = Color3.fromRGB(0, 128, 0)
@@ -19,83 +54,41 @@ title.TextColor3 = Color3.new(1,1,1)
 title.TextSize = 22
 title.Font = Enum.Font.SourceSansBold
 
--- Left Panel Buttons
-local buttons = {
-    "TRADE FREEZE",
-    "EGG RANDOMIZER",
-    "MUTATION FINDER",
-    "PET AGE LEVELER"
-}
+-- USERNAME INPUT
+local userBox = Instance.new("TextBox", frame)
+userBox.Position = UDim2.new(0, 260, 0, 40)
+userBox.Size = UDim2.new(0, 200, 0, 30)
+userBox.PlaceholderText = "Enter Victim Username"
+userBox.Font = Enum.Font.SourceSans
+userBox.TextColor3 = Color3.new(0,0,0)
+userBox.BackgroundColor3 = Color3.new(1,1,1)
 
-for i, name in ipairs(buttons) do
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(0, 180, 0, 30)
-    btn.Position = UDim2.new(0, 10, 0, 40 + (i - 1) * 40)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.Text = name
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.Font = Enum.Font.SourceSans
-    btn.TextSize = 18
-    btn.Name = name:gsub(" ", "")
-    btn.MouseButton1Click:Connect(function()
-        print(name .. " clicked")
-        -- insert real function here
-    end)
-end
-
--- Victim Username
-local usernameBox = Instance.new("TextBox", frame)
-usernameBox.Size = UDim2.new(0, 200, 0, 30)
-usernameBox.Position = UDim2.new(0, 260, 0, 40)
-usernameBox.Text = "Enter Victim Username"
-usernameBox.Font = Enum.Font.SourceSans
-usernameBox.TextSize = 18
-usernameBox.TextColor3 = Color3.new(0, 0, 0)
-usernameBox.BackgroundColor3 = Color3.new(1,1,1)
-
--- Toggles
-local isTradeFrozen = false
-local isAutoAccept = false
-
-local function createToggle(name, yPos, stateVar, callback)
-    local btn = Instance.new("TextButton", frame)
-    btn.Size = UDim2.new(0, 200, 0, 30)
-    btn.Position = UDim2.new(0, 260, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(128, 0, 0)
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.Font = Enum.Font.SourceSans
-    btn.TextSize = 18
-    btn.Name = name
-
-    local function update()
-        btn.Text = name:gsub("Toggle", "") .. ": " .. (callback() and "ON" or "OFF")
-        btn.BackgroundColor3 = callback() and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(128, 0, 0)
-    end
-
-    btn.MouseButton1Click:Connect(function()
-        stateVar = not stateVar
-        update()
-    end)
-
-    update()
-    return btn
-end
-
--- Trade Freeze Toggle
-createToggle("TradeFreezeToggle", 80, isTradeFrozen, function()
-    isTradeFrozen = not isTradeFrozen
-    print("Trade Freeze is now", isTradeFrozen and "ENABLED" or "DISABLED")
-    return isTradeFrozen
+-- TRADE FREEZE BUTTON
+local freezeBtn = Instance.new("TextButton", frame)
+freezeBtn.Position = UDim2.new(0, 10, 0, 40)
+freezeBtn.Size = UDim2.new(0, 180, 0, 30)
+freezeBtn.Text = "TRADE FREEZE"
+freezeBtn.TextColor3 = Color3.new(1,1,1)
+freezeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+freezeBtn.MouseButton1Click:Connect(function()
+	local victim = userBox.Text
+	if victim ~= "" then
+		freezeTradeFor(victim)
+	else
+		warn("Enter a username first.")
+	end
 end)
 
--- Auto Accept Toggle
-createToggle("AutoAcceptToggle", 120, isAutoAccept, function()
-    isAutoAccept = not isAutoAccept
-    print("Auto Accept is now", isAutoAccept and "ENABLED" or "DISABLED")
-    return isAutoAccept
-end)
+-- EGG RANDOMIZER BUTTON
+local eggBtn = Instance.new("TextButton", frame)
+eggBtn.Position = UDim2.new(0, 10, 0, 80)
+eggBtn.Size = UDim2.new(0, 180, 0, 30)
+eggBtn.Text = "EGG RANDOMIZER"
+eggBtn.TextColor3 = Color3.new(1,1,1)
+eggBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+eggBtn.MouseButton1Click:Connect(randomizeEgg)
 
--- Discord Footer
+-- Discord footer
 local discord = Instance.new("TextLabel", frame)
 discord.Size = UDim2.new(1, 0, 0, 30)
 discord.Position = UDim2.new(0, 0, 1, -30)
